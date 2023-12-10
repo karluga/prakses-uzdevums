@@ -146,3 +146,54 @@ span.text-main {
   font-weight: 300;
   color: #384045;
 }
+
+/* LOGIN & REGISTER */
+
+@media only screen and (max-width: 600px) {
+  .container {
+    max-width: 100%;
+  }
+}
+
+.flip-container {
+  display: flex;
+  justify-content: center;
+}
+
+.flip-container.flip .flipper .front{
+  transform: rotateY(180deg); /* Flip to reveal the back side */
+}
+
+.flip-container.flip .flipper .back{
+  transform: rotateY(0deg); /* Flip back to the front side */
+}
+.flipper {
+  width: 300px;
+  height: 400px;
+  perspective: 1000px; /* Add 3D perspective */
+  margin: 10px;
+}
+
+.front,
+.back {
+  width: -webkit-fill-available;
+  height: -webkit-fill-available;
+  padding: 10px;
+  position: absolute;
+  display: flex;
+  flex-direction: column; /* Stack title, quote, and additional text vertically */
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0;
+  backface-visibility: hidden; /* Hide the backface initially */
+  transition: transform 0.5s; /* Add a smooth transition effect */
+}
+
+.front {
+  z-index: 2;
+}
+
+.back {
+  transform: rotateY(
+    180deg
+); /* Rotate the back side by 180 degrees, initially hidden */}

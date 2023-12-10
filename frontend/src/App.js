@@ -1,182 +1,45 @@
-// App.js
-import logo from './logo.svg';
-import './App.css';
-import React, { useState, useEffect } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import axios from 'axios';
-import MapComponent from './MapComponent.js';
-import { useJsApiLoader } from '@react-google-maps/api';
-import { ReactComponent as CalendarSvg } from './calendar.svg';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from './AuthContext';
 
-const librariesArray = ['geometry'];  // Define the libraries array outside the component
+import Layout from "./pages/Layout";
+import NoPage from './pages/NoPage';
+import Login from './pages/Login';
+import RouteReport from './pages/RouteReport';
+import RouteExport from './pages/RouteExport';
+
+// Create a ProtectedRoute component that redirects to /login if the user is not authenticated
+const ProtectedRoute = ({ children }) => {
+  const auth = useAuth();
+  if (!auth.user) {
+    // User is not authenticated, redirect to /login
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
 
 function App() {
-  const [fromDate, setFromDate] = useState(new Date('2023-11-10'));
-  const [toDate, setToDate] = useState(new Date());
-  const [vehicleOptions, setVehicleOptions] = useState([]);
-  const [selectedVehicle, setSelectedVehicle] = useState('');
-  const [vehicleError, setVehicleError] = useState('');
-  const [dateRangeError, setDateRangeError] = useState('');
-  const [routes, setRoutes] = useState([]);
-
-  const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
-    libraries: librariesArray,  // Use the constant here
-  });
-
-  const formatDateWithDots = (date) => {
-    const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-    const formattedDate = new Intl.DateTimeFormat('default', options).format(date);
-    return formattedDate.replace(/\//g, '.');
-  };
-
-  useEffect(() => {
-    const fetchVehicleOptions = async () => {
-      try {
-        const response = await axios.get('https://mapon.com/api/v1/unit/list.json?key=' + process.env.REACT_APP_MAPON_API_KEY);
-        if (response.data && response.data.data && response.data.data.units) {
-          setVehicleOptions(response.data.data.units);
-          console.log('Fetched vehicle options:', response.data.data.units);
-        }
-      } catch (error) {
-        console.error('Error fetching vehicle options:', error);
-      }
-    };
-
-    fetchVehicleOptions();
-  }, []);
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    setVehicleError('');
-    setDateRangeError('');
-
-    if (!selectedVehicle) {
-      setVehicleError('Please select a vehicle.');
-      
-      // Clear the error message after 5 seconds
-      setTimeout(() => {
-        setVehicleError('');
-      }, 5000);
-      
-      return;
-    }
-
-    const maxDateRange = 31;
-    const currentDate = new Date();
-
-    if (fromDate > currentDate || toDate > currentDate) {
-      setDateRangeError('Dates cannot exceed the current date.');
-      return;
-    }
-
-    const timeDifference = toDate.getTime() - fromDate.getTime();
-    const dayDifference = timeDifference / (1000 * 3600 * 24);
-
-    if (dayDifference > maxDateRange || fromDate > toDate) {
-      setDateRangeError('Invalid date range. Please check your dates.');
-
-      setTimeout(() => {
-        setDateRangeError('');
-      }, 5000);
-      return;
-    }
-
-    try {
-      const response = await axios.get(
-        `https://mapon.com/api/v1/route/list.json?key=${process.env.REACT_APP_MAPON_API_KEY}&from=${fromDate.toISOString().split('.')[0] + 'Z'}&till=${toDate.toISOString().split('.')[0] + 'Z'}&unit_id=${selectedVehicle}&include[]=decoded_route`
-      );
-
-      if (response.data && response.data.error) {
-        const { code, msg } = response.data.error;
-        console.error('API Error:', code, msg);
-        return;
-      }
-
-      if (response.data && response.data.data && response.data.data.units && response.data.data.units[0] && response.data.data.units[0].routes) {
-        const filteredRoutes = response.data.data.units[0].routes.filter(route => route.type === 'route');
-        console.log(filteredRoutes);
-        setRoutes(filteredRoutes);
-      }
-    } catch (error) {
-      console.error('An unexpected error occurred:', error);
-    }
-  };
-
   return (
-    <div className="App">
-      <div className="errors">
-        <p className={`error-modal ${!vehicleError && 'invisible'}`}>
-          {vehicleError}
-        </p>
-        <p className={`error-modal ${!dateRangeError && 'invisible'}`}>
-          {dateRangeError}
-        </p>
-      </div>
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-      </header>
-      <div className="container">
-        <form className="route-report" onSubmit={handleSubmit}>
-          <div className="wrapper">
-          <h1>Route report</h1>
-            <div className="input">
-              <label htmlFor="vehicle-number" className="input-label required">Vehicle number</label>
-              <select
-                id="vehicle-number"
-                name="vehicle-number"
-                value={selectedVehicle}
-                onChange={(e) => setSelectedVehicle(e.target.value)}
-              >
-                <option value="" defaultValue>
-                  Select vehicle
-                </option>
-                {vehicleOptions.map((vehicle) => (
-                  <option key={vehicle.unit_id} value={vehicle.unit_id}>
-                    {vehicle.label} - {vehicle.number}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="input">
-              <span className="input-label">Period</span>
-              <div className="period">
-                <div className="date">
-                  <label htmlFor="from-date">From</label>
-                  <DatePicker
-                    showIcon
-                    id="from-date"
-                    selected={fromDate}
-                    onChange={setFromDate}
-                    dateFormat={formatDateWithDots(fromDate)}
-                    icon={<CalendarSvg />}
-                  />
-                </div>
-                <div className="date">
-                  <label htmlFor="to-date">To</label>
-                  <DatePicker
-                    showIcon
-                    id="to-date"
-                    selected={toDate}
-                    onChange={setToDate}
-                    dateFormat={formatDateWithDots(toDate)}
-                    icon={<CalendarSvg />}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="action">
-            <button type="submit">Generate</button>
-          </div>
-        </form>
-        {isLoaded && routes.map((route, index) => (
-          <MapComponent key={index} route={route} isLoaded={isLoaded} />
-        ))}
-      </div>
-    </div>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={
+              <ProtectedRoute>
+                <RouteReport />
+              </ProtectedRoute>
+            } />
+            <Route path="export" element={
+              <ProtectedRoute>
+                <RouteExport />
+              </ProtectedRoute>
+            } />
+          <Route path="/login" element={<Login />} />
+          </Route>
+          <Route path="*" element={<NoPage />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
