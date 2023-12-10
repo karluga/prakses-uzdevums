@@ -3,10 +3,10 @@ import React, { createContext, useState, useEffect } from 'react';
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || null);
+  const [user, setUser] = useState(JSON.parse(sessionStorage.getItem('user')) || null);
 
   useEffect(() => {
-    localStorage.setItem('user', JSON.stringify(user));
+    sessionStorage.setItem('user', JSON.stringify(user));
   }, [user]);
 
   const setAuthUser = (userData) => {

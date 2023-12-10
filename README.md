@@ -26,10 +26,12 @@ npm install
 ### List of Dependencies
 
 - react
-- react-dom
+- react-router-dom
 - react-datepicker
 - axios
 - @react-google-maps/api
+- react-icons
+- xlsx
 
 ## Configure API Keys
 
@@ -87,10 +89,12 @@ npm install
 ### Papildinājumu saraksts
 
 - react
-- react-dom
+- react-router-dom
 - react-datepicker
 - axios
 - @react-google-maps/api
+- react-icons
+- xlsx
 
 ## Konfigurējiet API atslēgas
 

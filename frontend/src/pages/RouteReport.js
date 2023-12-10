@@ -6,8 +6,38 @@ import axios from 'axios';
 import MapComponent from './MapComponent';
 import { useJsApiLoader } from '@react-google-maps/api';
 import { ReactComponent as CalendarSvg } from '../calendar.svg';
+import * as XLSX from 'xlsx';
+import { RiFileExcel2Fill } from "react-icons/ri";
 
 const librariesArray = ['geometry'];  // Define the libraries array outside the component
+
+const exportToExcel = (dataToExport) => {
+  if (dataToExport.length === 0) {
+    console.warn('No data to export.');
+    return;
+  }
+
+  const ws = XLSX.utils.json_to_sheet(dataToExport);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Routes');
+  XLSX.writeFile(wb, 'routes.xlsx');
+};
+
+function formatDrivingTime(startTime, endTime) {
+  const start = new Date(startTime);
+  const end = new Date(endTime);
+
+  const timeDifference = end - start;
+
+  const hours = Math.floor(timeDifference / (1000 * 60 * 60));
+  const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  } else {
+    return `${minutes}m`;
+  }
+}
 
 function RouteReport() {
   const [fromDate, setFromDate] = useState(new Date('2023-11-10'));
@@ -29,6 +59,17 @@ function RouteReport() {
     return formattedDate.replace(/\//g, '.');
   };
 
+  const filterData = (routes) => {
+    return routes.map((route, index) => ({
+      StartTime: route.start.time,
+      EndTime: route.end.time,
+      StartAddress: route.start.address,
+      EndAddress: route.end.address,
+      Duration: formatDrivingTime(route.start.time, route.end.time),
+      Distance: (route.distance / 1000).toFixed(2),
+    }));
+  };
+  
   useEffect(() => {
     const fetchVehicleOptions = async () => {
       try {
@@ -81,7 +122,7 @@ function RouteReport() {
       }, 5000);
       return;
     }
-
+    console.log(`https://mapon.com/api/v1/route/list.json?key=${process.env.REACT_APP_MAPON_API_KEY}&from=${fromDate.toISOString().split('.')[0] + 'Z'}&till=${toDate.toISOString().split('.')[0] + 'Z'}&unit_id=${selectedVehicle}&include[]=decoded_route`);
     try {
       const response = await axios.get(
         `https://mapon.com/api/v1/route/list.json?key=${process.env.REACT_APP_MAPON_API_KEY}&from=${fromDate.toISOString().split('.')[0] + 'Z'}&till=${toDate.toISOString().split('.')[0] + 'Z'}&unit_id=${selectedVehicle}&include[]=decoded_route`
@@ -164,7 +205,13 @@ function RouteReport() {
             </div>
           </div>
           <div className="action">
-            <button type="submit">Generate</button>
+          {routes.length > 0 && (
+            <button type="button" onClick={() => exportToExcel(filterData(routes))}>
+              <RiFileExcel2Fill />
+              Export to Excel
+              </button>
+          )}
+          <button type="submit">Generate</button>
           </div>
         </form>
         {isLoaded && routes.map((route, index) => (
