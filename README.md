@@ -1,6 +1,6 @@
 <img src="https://res.cloudinary.com/practicaldev/image/fetch/s--eFpINR9o--/c_imagga_scale,f_auto,fl_progressive,h_420,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/5c9mxgm5czaxntrvfgaq.png" alt="React Icon" height="100">
 
- # Driving route report system <sup><sub>EN</sub></sup>
+# Driving route report system <sup><sub>EN</sub></sup>
 
 This is a small project using the [React.js](https://react.dev/) JavaScript framework and two API's:
 [Mapon API](https://mapon.com/api/) and [Google Maps API](https://developers.google.com/maps/documentation/routes)
@@ -71,6 +71,20 @@ The back-end is built using a MySQL database and vanilla PHP.
 6. In the `frontend/src/pages/Login.js` file change the path to the back-end server, if it is different from this: `http://localhost/backend/`.
 After all that, the back-end is already usable from the front-end
 
+## Testing
+The react application comes with an already installed test library [Jest.js] (https://jestjs.io/) and a template.
+All you have to do is run on the command line
+```
+NPM test
+```
+
+## Conclusion and proposals
+- The work can be better.
+- I used sessionStorage instead of localStorage for user registration.
+- From a performance point of view, an API call with the dates "from" and "until" picks up a large amount of data at the same time, so it didn't matter to create a dynamic load, for example by scrolling through every 20 records (route maps), a new batch appears.
+- For the front-end, with just react and PHP, there wasn't enough time to create sign-in so that the user is signed out if their profile disappears from the database.
+- I assume that running the command `npm run build` deletes all unnecessary items from the coding process, unnecessary imports, comments, etc.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
@@ -79,7 +93,7 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 <br>
 
- # Braukšanas maršruta ziņojumu sistēma <sup><sub>LV</sub></sup>
+# Braukšanas maršruta ziņojumu sistēma <sup><sub>LV</sub></sup>
 
 Šis ir neliels projekts, izmantojot [React.js](https://react.dev/) ietvaru un divas lietojumprogrammu saskarnes:
 [Mapon API](https://mapon.com/api/) un [Google Maps API](https://developers.google.com/maps/documentation/routes).
@@ -149,6 +163,20 @@ Aizmugursistēma ir veidota, izmantojot MySQL datu bāzi un parasto PHP.
 5. Importējiet datus no faila `backend/accounts.sql`, lai izveidotu tabulu un iegūtu parauga datus.
 6. Failā `frontend/src/pages/Login.js` mainiet ceļu uz aizmugursistēmas serveri, ja tas atšķiras no šī: `http://localhost/backend/`.
 Kad viss ir izdarīts, aplikācijas front-end daļa varēs piekļūt back-end daļai.
+
+## Testēšana
+React aplikācija nāk līdzi jau ar uzstādītu testēšanas bibliotēku [Jest.js](https://jestjs.io/) un sagatavi.
+Viss, ko atliek izdarīt ir komandrindā palaist
+```
+npm test
+```
+
+## Secinājumi un priekšlikumi
+- Noteikti varēja būt labāk.
+- Lietotāja reģistrācijai lietoju sessionStorage, nevis localStorage.
+- No veiktspējas viedokļa API izsaukums ar datumiem no un līdz paņem lielu daudzumu ar datiem vienlaikus, tāpēc nebija nozīmes izveidot dinamisku ielādi, piemēram, ritinot ielādējot ik pa 20 ierakstiem (maršrutu kartēm).
+- Priekš front-end, izmantojot tikai React un PHP nepietika laika izveidot pierakstīšanos tā, lai lietotājs tiek izrakstīts, ja viņa profils pazūd no datubāzes.
+- Pieņemu, ka palaižot komandu `npm run build` tiek izdzēsts visas nevajadzīgās lietas no kodēšanas procesa, lieki importi, komentāri, u.c.
 
 ## Licence
 
