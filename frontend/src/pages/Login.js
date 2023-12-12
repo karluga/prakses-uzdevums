@@ -143,7 +143,7 @@ const Login = () => {
 
           <form className="front" onSubmit={handleLogin}>
             <h1>Login</h1>
-            <label htmlFor="loginUsername">Username:</label>
+            <label htmlFor="loginUsername">Username or E-mail:</label>
             <input
               id="loginUsername"
               type="text"
