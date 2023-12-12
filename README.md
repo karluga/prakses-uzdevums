@@ -83,6 +83,7 @@ NPM test
 - I used sessionStorage instead of localStorage for user registration.
 - From a performance point of view, an API call with the dates "from" and "until" picks up a large amount of data at the same time, so it didn't matter to create a dynamic load, for example by scrolling through every 20 records (route maps), a new batch appears.
 - For the front-end, with just react and PHP, there wasn't enough time to create sign-in so that the user is signed out if their profile disappears from the database.
+- From the API I chose the hardest way to display the routes, which was `include[]=decoded_route` instead of `include[]=polyline`, because i saw one route that was litterally across the water.
 - I assume that running the command `npm run build` deletes all unnecessary items from the coding process, unnecessary imports, comments, etc.
 
 ## License
@@ -176,6 +177,7 @@ npm test
 - Lietotāja reģistrācijai lietoju sessionStorage, nevis localStorage.
 - No veiktspējas viedokļa API izsaukums ar datumiem no un līdz paņem lielu daudzumu ar datiem vienlaikus, tāpēc nebija nozīmes izveidot dinamisku ielādi, piemēram, ritinot ielādējot ik pa 20 ierakstiem (maršrutu kartēm).
 - Priekš front-end, izmantojot tikai React un PHP nepietika laika izveidot pierakstīšanos tā, lai lietotājs tiek izrakstīts, ja viņa profils pazūd no datubāzes.
+- no API izvēlējos visgrūtāko maršrutu attēlošanas veidu, kas bija `include[]=decoded_route`, nevis `include[]=polyline`, jo redzēju vienu maršrutu, kas bija pa taisni pāri ūdenim.
 - Pieņemu, ka palaižot komandu `npm run build` tiek izdzēsts visas nevajadzīgās lietas no kodēšanas procesa, lieki importi, komentāri, u.c.
 
 ## Licence
