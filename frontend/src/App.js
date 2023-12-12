@@ -1,12 +1,11 @@
-import React from 'react';
+import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider, useAuth } from './AuthContext';
+import { AuthProvider, useAuth } from "./AuthContext.js";
 
-import Layout from "./pages/Layout";
-import NoPage from './pages/NoPage';
-import Login from './pages/Login';
-import RouteReport from './pages/RouteReport';
-import RouteExport from './pages/RouteExport';
+import Layout from "./pages/Layout.js";
+import NoPage from "./pages/NoPage.js";
+import Login from "./pages/Login.js";
+import RouteReport from "./pages/RouteReport.js";
 
 // Create a ProtectedRoute component that redirects to /login if the user is not authenticated
 const ProtectedRoute = ({ children }) => {
@@ -24,17 +23,15 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route index element={
-              <ProtectedRoute>
-                <RouteReport />
-              </ProtectedRoute>
-            } />
-            <Route path="export" element={
-              <ProtectedRoute>
-                <RouteExport />
-              </ProtectedRoute>
-            } />
-          <Route path="/login" element={<Login />} />
+            <Route
+              index
+              element={
+                <ProtectedRoute>
+                  <RouteReport />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/login" element={<Login />} />
           </Route>
           <Route path="*" element={<NoPage />} />
         </Routes>

@@ -1,42 +1,123 @@
 @font-face {
-  font-family: 'MuseoSans';
-  src: url(../public/fonts/MuseoSans_100.otf) format('opentype');
+  font-family: "MuseoSans";
+  src: url(../public/fonts/museo-sans/MuseoSans-100.otf) format("opentype");
   font-weight: 100;
+  font-style: normal;
 }
 
 @font-face {
-  font-family: 'MuseoSans';
-  src: url(../public/fonts/MuseoSans_300.otf) format('opentype');
+  font-family: "MuseoSans";
+  src: url(../public/fonts/museo-sans/MuseoSans-100Italic.otf)
+    format("opentype");
+  font-weight: 100;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "MuseoSans";
+  src: url(../public/fonts/museo-sans/MuseoSans-300.otf) format("opentype");
   font-weight: 300;
+  font-style: normal;
 }
 
 @font-face {
-  font-family: 'MuseoSans';
-  src: url(../public/fonts/MuseoSans_500.otf) format('opentype');
+  font-family: "MuseoSans";
+  src: url(../public/fonts/museo-sans/MuseoSans-300Italic.otf)
+    format("opentype");
+  font-weight: 300;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "MuseoSans";
+  src: url(../public/fonts/museo-sans/MuseoSans_500.otf) format("opentype");
   font-weight: 500;
+  font-style: normal;
 }
 
 @font-face {
-  font-family: 'MuseoSans';
-  src: url(../public/fonts/MuseoSans_700.otf) format('opentype');
+  font-family: "MuseoSans";
+  src: url(../public/fonts/museo-sans/MuseoSans_500_Italic.otf)
+    format("opentype");
+  font-weight: 500;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "MuseoSans";
+  src: url(../public/fonts/museo-sans/MuseoSans_700.otf) format("opentype");
   font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "MuseoSans";
+  src: url(../public/fonts/museo-sans/MuseoSans-700Italic.otf)
+    format("opentype");
+  font-weight: 700;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "MuseoSans";
+  src: url(../public/fonts/museo-sans/MuseoSans_900.otf) format("opentype");
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "MuseoSans";
+  src: url(../public/fonts/museo-sans/MuseoSans-900Italic.otf) format("opentype");
+  font-weight: 900;
+  font-style: italic;
 }
 
 .App {
-  font-family: 'MuseoSans';
+  font-family: "MuseoSans";
   min-height: 100vh;
   background-color: #fafafa;
+  color: #384045;
   padding: 15px 0;
 }
 
-.App-logo {
-  height: 50px;
-  pointer-events: none;
+.App-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+  margin: 0px 10px 10px 10px;
 }
 
-.App-header {
-  text-align: center;
+.App-logo {
+  grid-column: 2 / 3;
+  justify-self: center;
 }
+
+.user-info {
+  justify-self: end;
+}
+.user-info p {
+  display: inline-block;
+  margin-right: 1rem;
+}
+@media (max-width: 800px) {
+  .App-header {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+
+  .App-logo {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .user-info {
+    grid-column: 1;
+    grid-row: 3;
+    justify-self: center;
+  }
+}
+
 .container {
   max-width: 500px;
   margin: auto;
@@ -44,17 +125,17 @@
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08), 0px 2px 14px rgba(0, 0, 0, 0.06);
 }
 button {
-  background: #98CA02;
+  background: #98ca02;
   color: white;
   border-radius: 3px;
-  width: 103px;
-  height: 32px;
   font-size: 14px;
   line-height: 16px;
-  text-align: center;
+  padding: 9px 12px;
   text-transform: uppercase;
   border: none;
   cursor: pointer;
+}
+button#generate-btn {
   margin-left: auto;
 }
 .action {
@@ -69,11 +150,13 @@ button {
   flex-wrap: wrap;
   justify-content: space-between;
 }
-#vehicle-number, .period {
+#vehicle-number,
+.period {
   width: 70%;
   min-width: 80px;
-
+  height: min-content;
 }
+
 .wrapper {
   padding: 2rem;
 }
@@ -81,13 +164,13 @@ button {
   margin-top: 0;
 }
 .date {
-    display: flex;
-    flex-direction: column;
-    width: 50%;
-
+  display: flex;
+  flex-direction: column;
+  width: 49%;
 }
 .period {
   display: flex;
+  justify-content: space-between;
 }
 .wrapper .input:nth-child(2) {
   margin-bottom: 1rem;
@@ -100,8 +183,8 @@ button {
   min-width: 70px;
 }
 .required::after {
-  content: '*';
-  color: red;
+  content: "*";
+  color: #ff4141;
   font-size: 20px;
 }
 .error-modal {
@@ -109,7 +192,7 @@ button {
   background: #ae0000;
   color: white;
   border-radius: 5px;
-  transition: height 0.5s ease-in-out, top 0.5s ease-in-out; /* Adjust the duration and timing function as needed */
+  transition: height 0.5s ease-in-out, top 0.5s ease-in-out;
   position: fixed;
   top: 0;
   left: 0;
@@ -117,8 +200,8 @@ button {
 }
 
 .invisible {
-  top: -50px; /* Adjust the value to position it off-screen */
-  transition: height 0.5s ease-in-out, top 0.5s ease-in-out; /* Adjust the duration and timing function as needed */
+  top: -50px;
+  transition: height 0.5s ease-in-out, top 0.5s ease-in-out;
 }
 .details {
   display: flex;
@@ -131,15 +214,14 @@ button {
   text-align: center;
   padding: 4px 7px;
   min-width: 130px;
-
 }
 .measurement:not(:last-child) {
-  border-right: 1px solid #D8D8D8;
+  border-right: 1px solid #d8d8d8;
 }
 span.text-muted {
   font-size: 12px;
   text-align: center;
-  color: #797F82;
+  color: #797f82;
 }
 span.text-main {
   font-size: 20px;
@@ -160,17 +242,17 @@ span.text-main {
   justify-content: center;
 }
 
-.flip-container.flip .flipper .front{
-  transform: rotateY(180deg); /* Flip to reveal the back side */
+.flip-container.flip .flipper .front {
+  transform: rotateY(180deg);
 }
 
-.flip-container.flip .flipper .back{
-  transform: rotateY(0deg); /* Flip back to the front side */
+.flip-container.flip .flipper .back {
+  transform: rotateY(0deg);
 }
 .flipper {
   width: 300px;
   height: 400px;
-  perspective: 1000px; /* Add 3D perspective */
+  perspective: 1000px;
   margin: 10px;
 }
 
@@ -181,12 +263,12 @@ span.text-main {
   padding: 10px;
   position: absolute;
   display: flex;
-  flex-direction: column; /* Stack title, quote, and additional text vertically */
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   background-color: #f0f0f0;
-  backface-visibility: hidden; /* Hide the backface initially */
-  transition: transform 0.5s; /* Add a smooth transition effect */
+  backface-visibility: hidden;
+  transition: transform 0.5s;
 }
 
 .front {
@@ -196,4 +278,49 @@ span.text-main {
 .back {
   transform: rotateY(
     180deg
-); /* Rotate the back side by 180 degrees, initially hidden */}
+  );
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: transparent;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%23BBBEC0' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+  background-repeat: no-repeat;
+  background-position-x: 100%;
+  background-position-y: 50%;
+  color: inherit;
+  font-family: inherit;
+  border: 1px solid #dcdee0;
+  border-radius: 2px;
+  padding: 5px 10px;
+}
+input {
+  color: inherit;
+  font-family: inherit;
+  border: 1px solid #dcdee0;
+  border-radius: 2px;
+  padding: 5px 10px !important;
+}
+.react-datepicker__input-container .react-datepicker__calendar-icon {
+  padding: 0 !important;
+  right: 10px;
+  top: 50%;
+  transform: translate(0, -50%);
+  font-size: 24px;
+  pointer-events: none; /* click through */
+}
+
+@media only screen and (max-width: 440px) {
+  .date {
+    width: 100%;
+  }
+  .period {
+    flex-direction: column;
+  }
+  #vehicle-number,
+  .period {
+    width: 100%;
+  }
+}

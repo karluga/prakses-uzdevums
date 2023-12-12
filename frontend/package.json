@@ -2,6 +2,12 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
+  "jest": {
+    "moduleNameMapper": {
+      "axios": "axios/dist/node/axios.cjs",
+      "^react-icons/(.*)$": "<rootDir>/node_modules/react-icons/$1"
+    }
+  },
   "dependencies": {
     "@react-google-maps/api": "^2.19.2",
     "@testing-library/jest-dom": "^5.17.0",
@@ -40,5 +46,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "axios-mock-adapter": "^1.22.0"
   }
 }

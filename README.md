@@ -1,8 +1,9 @@
 <img src="https://res.cloudinary.com/practicaldev/image/fetch/s--eFpINR9o--/c_imagga_scale,f_auto,fl_progressive,h_420,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/5c9mxgm5czaxntrvfgaq.png" alt="React Icon" height="100">
 
-> # Driving route report system <sup><sub>EN</sub></sup>
+ # Driving route report system <sup><sub>EN</sub></sup>
 
-This is a small project using the [Mapon API](https://mapon.com/api/) and [Google Maps API](https://developers.google.com/maps/documentation/routes)
+This is a small project using the [React.js](https://react.dev/) JavaScript framework and two API's:
+[Mapon API](https://mapon.com/api/) and [Google Maps API](https://developers.google.com/maps/documentation/routes)
 
 ## Prerequisites
 
@@ -55,6 +56,21 @@ npm start
 ```
 Access the application at http://localhost:8000 :grinning:
 
+<img src="https://brandslogos.com/wp-content/uploads/images/large/php-logo.png" alt="PHP Icon" height="50">
+<img src="https://www.freeiconspng.com/thumbs/plus-icon/plus-icon-black-2.png" alt="Plus" height="50">
+<img src="https://upload.wikimedia.org/wikipedia/labs/8/8e/Mysql_logo.png" alt="MySQL Icon" height="50">
+
+## Back-end setup
+The back-end is built using a MySQL database and vanilla PHP.
+### To get it running
+1. Have any local Apache and MySQl server software installed on your computer. Personally, i used WampServer, because i use Windows. I suggest to use [Laragon](https://laragon.org/download/index.html).
+2. Drag the `backend` folder in the folder that hosts all the web files, in my case `www`
+3. Turn on both Apache and MySQL servers
+4. Create a database called `mapon_db` or give it any other name, just make sure it matches in the `backend/config.ini` file. Same goes for the other credentials `user` and `pass`.
+5. Import the data from `backend/accounts.sql` file to create a table and get sample data.
+6. In the `frontend/src/pages/Login.js` file change the path to the back-end server, if it is different from this: `http://localhost/backend/`.
+After all that, the back-end is already usable from the front-end
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
@@ -63,9 +79,10 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 <br>
 
-> # Braukšanas maršruta ziņojumu sistēma <sup><sub>LV</sub></sup>
+ # Braukšanas maršruta ziņojumu sistēma <sup><sub>LV</sub></sup>
 
-Šis ir neliels projekts, izmantojot [Mapon API](https://mapon.com/api/) un [Google Maps API](https://developers.google.com/maps/documentation/routes).
+Šis ir neliels projekts, izmantojot [React.js](https://react.dev/) ietvaru un divas lietojumprogrammu saskarnes:
+[Mapon API](https://mapon.com/api/) un [Google Maps API](https://developers.google.com/maps/documentation/routes).
 
 ## Priekšnosacījumi
 
@@ -117,6 +134,21 @@ npm install
 npm start
 ```
 Lietotnei var piekļūt vietnē http://localhost:3000 :grinning:
+
+<img src="https://brandslogos.com/wp-content/uploads/images/large/php-logo.png" alt="PHP Icon" height="50">
+<img src="https://www.freeiconspng.com/thumbs/plus-icon/plus-icon-black-2.png" alt="Plus" height="50">
+<img src="https://upload.wikimedia.org/wikipedia/labs/8/8e/Mysql_logo.png" alt="MySQL Icon" height="50">
+
+## Aizmugursistēmas iestatīšana
+Aizmugursistēma ir veidota, izmantojot MySQL datu bāzi un parasto PHP.
+### Lai tas darbotos
+1. Datorā instalējiet jebkuru lokālo Apache un MySQL servera programmatūru. Personīgi izmantoju WampServer, jo lietoju Windows. Iesaku izmantot [Laragon] (https://laragon.org/download/index.html).
+2. Ielieciet mapi `backend` mapē, kurā tiek pasniegti visi tīmekļa faili, manā gadījumā — `www`
+3. Ieslēgt gan Apache, gan MySQL serverus
+4. Izveidojiet datu bāzi ar nosaukumu `mapon_db` vai izdomājiet tai citu nosaukumu un pārliecinieties, vai tā atbilst failam `backend/config.ini`. Tas pats attiecas uz citiem akreditācijas datiem `user` un `pass`.
+5. Importējiet datus no faila `backend/accounts.sql`, lai izveidotu tabulu un iegūtu parauga datus.
+6. Failā `frontend/src/pages/Login.js` mainiet ceļu uz aizmugursistēmas serveri, ja tas atšķiras no šī: `http://localhost/backend/`.
+Kad viss ir izdarīts, aplikācijas front-end daļa varēs piekļūt back-end daļai.
 
 ## Licence
 

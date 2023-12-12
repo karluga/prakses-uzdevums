@@ -1,29 +1,18 @@
 // MapComponent.js
-import React, { useState, useEffect } from 'react';
-import { GoogleMap, Polyline, Marker, useJsApiLoader } from '@react-google-maps/api';
+import React, { useState, useEffect } from "react";
+import {
+  GoogleMap,
+  Polyline,
+  Marker,
+  useJsApiLoader,
+} from "@react-google-maps/api";
+import { formatDrivingTime } from "../utils.js";
 
 const containerStyle = {
-  width: '100%',
-  height: '200px'
+  width: "100%",
+  height: "300px",
 };
-
-function formatDrivingTime(startTime, endTime) {
-  const start = new Date(startTime);
-  const end = new Date(endTime);
-
-  const timeDifference = end - start;
-
-  const hours = Math.floor(timeDifference / (1000 * 60 * 60));
-  const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
-
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`;
-  } else {
-    return `${minutes}m`;
-  }
-}
-
-const librariesArray = ['geometry'];
+const librariesArray = ["geometry"];
 
 function MapComponent({ route }) {
   const [map, setMap] = useState(null);
@@ -86,7 +75,7 @@ function MapComponent({ route }) {
       new window.google.maps.Polyline({
         path,
         map,
-        strokeColor: '#FF0000',
+        strokeColor: "#FF0000",
         strokeOpacity: 1.0,
         strokeWeight: 2,
       });
@@ -96,8 +85,8 @@ function MapComponent({ route }) {
         new window.google.maps.Marker({
           position: { lat: route.start.lat, lng: route.start.lng },
           map,
-          title: 'Start',
-          icon: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',  // Green marker for start
+          title: "Start",
+          icon: "https://maps.google.com/mapfiles/ms/icons/green-dot.png", // Green marker for start
         });
       }
 
@@ -105,8 +94,8 @@ function MapComponent({ route }) {
         new window.google.maps.Marker({
           position: { lat: route.end.lat, lng: route.end.lng },
           map,
-          title: 'End',
-          icon: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',  // Red marker for end
+          title: "End",
+          icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png", // Red marker for end
         });
       }
     }
@@ -131,15 +120,21 @@ function MapComponent({ route }) {
       </div>
       <div className="details">
         <div className="measurement distance">
-          <span className="text-main">{(route.distance / 1000).toFixed(2)}</span>
+          <span className="text-main">
+            {(route.distance / 1000).toFixed(2)}
+          </span>
           <span className="text-muted">Km driven</span>
         </div>
         <div className="measurement time">
-          <span className="text-main">{formatDrivingTime(route.start.time, route.end.time)}</span>
+          <span className="text-main">
+            {formatDrivingTime(route.start.time, route.end.time)}
+          </span>
           <span className="text-muted">Driving time</span>
         </div>
         <div className="measurement estimated">
-          <span className="text-main">{drivingTime !== null ? `${drivingTime}m` : 'Calculating...'}</span>
+          <span className="text-main">
+            {drivingTime !== null ? `${drivingTime}m` : "Calculating..."}
+          </span>
           <span className="text-muted">Estimated</span>
         </div>
       </div>

@@ -1,3 +1,5 @@
+// AuthContext.js
+
 import React, { createContext, useState, useEffect } from 'react';
 
 export const AuthContext = createContext(null);
@@ -13,8 +15,13 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
   };
 
+  const logout = () => {
+    // Perform any logout-related tasks (clear session, etc.)
+    setUser(null);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, setAuthUser }}>
+    <AuthContext.Provider value={{ user, setAuthUser, logout }}>
       {children}
     </AuthContext.Provider>
   );

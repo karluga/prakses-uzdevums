@@ -1,85 +1,85 @@
 // App.js
-import React, { useState, useEffect } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import axios from 'axios';
-import MapComponent from './MapComponent';
-import { useJsApiLoader } from '@react-google-maps/api';
-import { ReactComponent as CalendarSvg } from '../calendar.svg';
-import * as XLSX from 'xlsx';
-import { RiFileExcel2Fill } from "react-icons/ri";
+import React, { useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import MapComponent from "./MapComponent.js";
+import { useJsApiLoader } from "@react-google-maps/api";
+import { ReactComponent as CalendarSvg } from "../calendar.svg";
+import * as XLSX from "xlsx";
+import { RiFileExcel2Fill as ExcelIcon } from "react-icons/ri";
+import axios from "axios";
+import { formatDrivingTime, formatCustomDate } from "../utils.js";
 
-const librariesArray = ['geometry'];  // Define the libraries array outside the component
+function isValidRoute(route) {
+  const requiredKeys = [
+    "route_id",
+    "type",
+    "start",
+    "avg_speed",
+    "max_speed",
+    "end",
+    "distance",
+    "decoded_route",
+  ];
+  return requiredKeys.every((key) => key in route);
+}
 
-const exportToExcel = (dataToExport) => {
+const librariesArray = ["geometry"]; // Define the libraries array outside the component
+const baseUrl = "https://mapon.com/api/v1/";
+const exportToExcel = (dataToExport, customFileName) => {
   if (dataToExport.length === 0) {
-    console.warn('No data to export.');
+    console.warn("No data to export.");
     return;
   }
 
   const ws = XLSX.utils.json_to_sheet(dataToExport);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Routes');
-  XLSX.writeFile(wb, 'routes.xlsx');
+  XLSX.utils.book_append_sheet(wb, ws, "Routes");
+  XLSX.writeFile(wb, customFileName + ".xlsx");
 };
 
-function formatDrivingTime(startTime, endTime) {
-  const start = new Date(startTime);
-  const end = new Date(endTime);
-
-  const timeDifference = end - start;
-
-  const hours = Math.floor(timeDifference / (1000 * 60 * 60));
-  const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
-
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`;
-  } else {
-    return `${minutes}m`;
-  }
-}
-
 function RouteReport() {
-  const [fromDate, setFromDate] = useState(new Date('2023-11-10'));
+  const defaultFromDate = new Date();
+  defaultFromDate.setDate(defaultFromDate.getDate() - 7);
+
+  const [fromDate, setFromDate] = useState(defaultFromDate);
   const [toDate, setToDate] = useState(new Date());
   const [vehicleOptions, setVehicleOptions] = useState([]);
-  const [selectedVehicle, setSelectedVehicle] = useState('');
-  const [vehicleError, setVehicleError] = useState('');
-  const [dateRangeError, setDateRangeError] = useState('');
+  const [selectedVehicle, setSelectedVehicle] = useState("");
+  const [vehicleError, setVehicleError] = useState("");
+  const [dateRangeError, setDateRangeError] = useState("");
   const [routes, setRoutes] = useState([]);
+  const [fileName, setFileName] = useState("routes");
 
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
-    libraries: librariesArray,  // Use the constant here
+    libraries: librariesArray,
   });
 
-  const formatDateWithDots = (date) => {
-    const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-    const formattedDate = new Intl.DateTimeFormat('default', options).format(date);
-    return formattedDate.replace(/\//g, '.');
-  };
-
+  // MS Excel Column export
   const filterData = (routes) => {
     return routes.map((route, index) => ({
-      StartTime: route.start.time,
-      EndTime: route.end.time,
-      StartAddress: route.start.address,
-      EndAddress: route.end.address,
+      "Start Time": route.start.time,
+      "End Time": route.end.time,
+      "Start Address": route.start.address,
+      "End Address": route.end.address,
       Duration: formatDrivingTime(route.start.time, route.end.time),
       Distance: (route.distance / 1000).toFixed(2),
     }));
   };
-  
+
   useEffect(() => {
     const fetchVehicleOptions = async () => {
       try {
-        const response = await axios.get('https://mapon.com/api/v1/unit/list.json?key=' + process.env.REACT_APP_MAPON_API_KEY);
+        const response = await axios.get(
+          baseUrl + "unit/list.json?key=" + process.env.REACT_APP_MAPON_API_KEY
+        );
         if (response.data && response.data.data && response.data.data.units) {
           setVehicleOptions(response.data.data.units);
-          console.log('Fetched vehicle options:', response.data.data.units);
+          console.log("Fetched vehicle options:", response.data.data.units);
         }
       } catch (error) {
-        console.error('Error fetching vehicle options:', error);
+        console.error("Error fetching vehicle options:", error);
       }
     };
 
@@ -89,17 +89,17 @@ function RouteReport() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    setVehicleError('');
-    setDateRangeError('');
+    setVehicleError("");
+    setDateRangeError("");
 
     if (!selectedVehicle) {
-      setVehicleError('Please select a vehicle.');
-      
+      setVehicleError("Please select a vehicle.");
+
       // Clear the error message after 5 seconds
       setTimeout(() => {
-        setVehicleError('');
+        setVehicleError("");
       }, 5000);
-      
+
       return;
     }
 
@@ -107,7 +107,7 @@ function RouteReport() {
     const currentDate = new Date();
 
     if (fromDate > currentDate || toDate > currentDate) {
-      setDateRangeError('Dates cannot exceed the current date.');
+      setDateRangeError("Dates cannot exceed the current date.");
       return;
     }
 
@@ -115,51 +115,97 @@ function RouteReport() {
     const dayDifference = timeDifference / (1000 * 3600 * 24);
 
     if (dayDifference > maxDateRange || fromDate > toDate) {
-      setDateRangeError('Invalid date range. Please check your dates.');
+      setDateRangeError("Invalid date range. Please check your dates.");
 
       setTimeout(() => {
-        setDateRangeError('');
+        setDateRangeError("");
       }, 5000);
       return;
     }
-    console.log(`https://mapon.com/api/v1/route/list.json?key=${process.env.REACT_APP_MAPON_API_KEY}&from=${fromDate.toISOString().split('.')[0] + 'Z'}&till=${toDate.toISOString().split('.')[0] + 'Z'}&unit_id=${selectedVehicle}&include[]=decoded_route`);
-    try {
-      const response = await axios.get(
-        `https://mapon.com/api/v1/route/list.json?key=${process.env.REACT_APP_MAPON_API_KEY}&from=${fromDate.toISOString().split('.')[0] + 'Z'}&till=${toDate.toISOString().split('.')[0] + 'Z'}&unit_id=${selectedVehicle}&include[]=decoded_route`
-      );
+    const apiUrl = `${baseUrl}route/list.json?key=${
+      process.env.REACT_APP_MAPON_API_KEY
+    }&from=${fromDate.toISOString().split(".")[0] + "Z"}&till=${
+      toDate.toISOString().split(".")[0] + "Z"
+    }&unit_id=${selectedVehicle}&include[]=decoded_route`;
 
+    try {
+      const response = await axios.get(apiUrl);
       if (response.data && response.data.error) {
         const { code, msg } = response.data.error;
-        console.error('API Error:', code, msg);
+        console.error("API Error:", code, msg);
         return;
       }
 
-      if (response.data && response.data.data && response.data.data.units && response.data.data.units[0] && response.data.data.units[0].routes) {
-        const filteredRoutes = response.data.data.units[0].routes.filter(route => route.type === 'route');
-        console.log(filteredRoutes);
-        setRoutes(filteredRoutes);
+      if (
+        response.data &&
+        response.data.data &&
+        response.data.data.units &&
+        response.data.data.units[0] &&
+        response.data.data.units[0].routes
+      ) {
+        const unitId = response.data.data.units[0].unit_id;
+        const validRoutes = [];
+        const invalidRoutes = [];
+
+        response.data.data.units[0].routes.forEach((route) => {
+          if (route.type === "route") {
+            if (isValidRoute(route)) {
+              validRoutes.push(route);
+            } else {
+              invalidRoutes.push(route);
+            }
+          }
+        });
+
+        if (invalidRoutes.length > 0) {
+          console.log(`Invalid route structure found in unit_id: ${unitId}`);
+          invalidRoutes.forEach((route) =>
+            console.log(`Invalid route data:`, route)
+          );
+        }
+
+        console.log(validRoutes);
+        setRoutes(validRoutes);
       }
     } catch (error) {
-      console.error('An unexpected error occurred:', error);
+      console.error("An unexpected error occurred:", error);
+    }
+    console.log(vehicleOptions);
+
+    const selectedVehicleOption = vehicleOptions.find(
+      (option) => option.unit_id == selectedVehicle
+    );
+
+    if (selectedVehicleOption) {
+      const { label, number } = selectedVehicleOption;
+      setFileName(
+        `Routes_${label}_${number}_from_${formatCustomDate(
+          fromDate
+        )}_to_${formatCustomDate(toDate)}`
+      );
+    } else {
+      console.warn(`No vehicle option found for unit_id: ${selectedVehicle}`);
     }
   };
 
   return (
     <>
       <div className="errors">
-        <p className={`error-modal ${!vehicleError && 'invisible'}`}>
+        <p className={`error-modal ${!vehicleError && "invisible"}`}>
           {vehicleError}
         </p>
-        <p className={`error-modal ${!dateRangeError && 'invisible'}`}>
+        <p className={`error-modal ${!dateRangeError && "invisible"}`}>
           {dateRangeError}
         </p>
       </div>
       <div className="container">
         <form className="route-report" onSubmit={handleSubmit}>
           <div className="wrapper">
-          <h1>Route report</h1>
+            <h1>Route report</h1>
             <div className="input">
-              <label htmlFor="vehicle-number" className="input-label required">Vehicle number</label>
+              <label htmlFor="vehicle-number" className="input-label required">
+                Vehicle number
+              </label>
               <select
                 id="vehicle-number"
                 name="vehicle-number"
@@ -171,7 +217,7 @@ function RouteReport() {
                 </option>
                 {vehicleOptions.map((vehicle) => (
                   <option key={vehicle.unit_id} value={vehicle.unit_id}>
-                    {vehicle.label} - {vehicle.number}
+                    {vehicle.number} | {vehicle.label}
                   </option>
                 ))}
               </select>
@@ -186,7 +232,7 @@ function RouteReport() {
                     id="from-date"
                     selected={fromDate}
                     onChange={setFromDate}
-                    dateFormat={formatDateWithDots(fromDate)}
+                    dateFormat="yyyy.MM.dd"
                     icon={<CalendarSvg />}
                   />
                 </div>
@@ -197,7 +243,7 @@ function RouteReport() {
                     id="to-date"
                     selected={toDate}
                     onChange={setToDate}
-                    dateFormat={formatDateWithDots(toDate)}
+                    dateFormat="yyyy.MM.dd"
                     icon={<CalendarSvg />}
                   />
                 </div>
@@ -205,18 +251,25 @@ function RouteReport() {
             </div>
           </div>
           <div className="action">
-          {routes.length > 0 && (
-            <button type="button" onClick={() => exportToExcel(filterData(routes))}>
-              <RiFileExcel2Fill />
-              Export to Excel
+            {routes.length > 0 && (
+              <button
+                id="excel-btn"
+                type="button"
+                onClick={() => exportToExcel(filterData(routes, fileName))}
+              >
+                <ExcelIcon />
+                Export to Excel
               </button>
-          )}
-          <button type="submit">Generate</button>
+            )}
+            <button id="generate-btn" type="submit">
+              Generate
+            </button>
           </div>
         </form>
-        {isLoaded && routes.map((route, index) => (
-          <MapComponent key={index} route={route} isLoaded={isLoaded} />
-        ))}
+        {isLoaded &&
+          routes.map((route, index) => (
+            <MapComponent key={index} route={route} isLoaded={isLoaded} />
+          ))}
       </div>
     </>
   );
