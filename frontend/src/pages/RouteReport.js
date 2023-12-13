@@ -154,13 +154,7 @@ function RouteReport() {
         return;
       }
 
-      if (
-        response.data &&
-        response.data.data &&
-        response.data.data.units &&
-        response.data.data.units[0] &&
-        response.data.data.units[0].routes
-      ) {
+      if (response.data.data.units[0].routes) {
         const unitId = response.data.data.units[0].unit_id;
         const validRoutes = [];
         const invalidRoutes = [];
