@@ -9,8 +9,9 @@ This is a small project using the [React.js](https://react.dev/) JavaScript fram
 
 Before you begin, ensure you have met the following requirements:
 
-- [Node.js](https://nodejs.org/) installed, comes with npm (node package manager)
-- [Git](https://git-scm.com/) installed
+- [Node.js](https://nodejs.org/) installed, comes with npm (node package manager) - for JavaScript
+- [Git](https://git-scm.com/) installed - for source control
+- [Composer](https://getcomposer.org/download/) installed - for PHP
 
 ## Clone the Repository
 ```
@@ -72,12 +73,28 @@ The back-end is built using a MySQL database and vanilla PHP.
 After all that, the back-end is already usable from the front-end
 
 ## Testing
+### Front-end
 The react application comes with an already installed test library [Jest.js] (https://jestjs.io/) and a template.
 All you have to do is run on the command line
 ```
-NPM test
+cd frontend
+npm test
 ```
-
+### Back-end
+Before you can the back-end, you need to install an external resource `phpunit` that you can obtain by using the command:
+```
+composer install
+```
+After you run the command, you'll have to wait a while, and then all the needed files will appear in the `backend/vendor` folder.
+To make the tests, you must run:
+```
+cd backend
+vendor/bin/phpunit test
+```
+The tests will be correct if something like this appears in the console:
+`
+OK (6 tests, 9 assertions)
+`
 ## Conclusion and proposals
 - The work can be better.
 - I used sessionStorage instead of localStorage for user registration.
@@ -85,6 +102,7 @@ NPM test
 - For the front-end, with just react and PHP, there wasn't enough time to create sign-in so that the user is signed out if their profile disappears from the database.
 - From the API I chose the hardest way to display the routes, which was `include[]=decoded_route` instead of `include[]=polyline`, because i saw one route that was litterally across the water.
 - I assume that running the command `npm run build` deletes all unnecessary items from the coding process, unnecessary imports, comments, etc.
+- both PHP and JS tests were written by artificial intelligence ChatGpt, taking my code as an example. Testing the back-end in this project is not very important because automated tests are not intended to make database queries and perform API requests.
 
 ## License
 
@@ -103,8 +121,9 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 Pirms sākat, pārliecinieties, vai esat ir izpildīti šādi priekšnosacījumi:
 
-- Instalēts [Node.js](https://nodejs.org/), nāk līdzi ar npm (node package manager)
-- Instalēts [Git](https://git-scm.com/)
+- Instalēts [Node.js](https://nodejs.org/), nāk līdzi ar npm (node package manager) - priekš JavaScript
+- Instalēts [Git](https://git-scm.com/downloads) - priekš koda aprites
+- Instalēts [Composer](https://getcomposer.org/download/) - priekš PHP
 
 ## Izveidojiet arhīva dublējumkopiju
 ```
@@ -166,11 +185,28 @@ Aizmugursistēma ir veidota, izmantojot MySQL datu bāzi un parasto PHP.
 Kad viss ir izdarīts, aplikācijas front-end daļa varēs piekļūt back-end daļai.
 
 ## Testēšana
+### Front-end
 React aplikācija nāk līdzi jau ar uzstādītu testēšanas bibliotēku [Jest.js](https://jestjs.io/) un sagatavi.
 Viss, ko atliek izdarīt ir komandrindā palaist
 ```
+cd frontend
 npm test
 ```
+### Back-end
+Lai varētu iztestēt back-end darbību, vajag instalēt ārēju resursu `phpunit`, kuru var iegūt izmantojot komandu:
+```
+composer install
+```
+Pēc komandas palaišanas būs kādu brīdi jāuzgaida un tad visi vajadzīgie faili parādīsies `backend/vendor` mapē.
+Talāk lai palaistu testus ir jāpalaiž:
+```
+cd backend
+vendor/bin/phpunit tests
+```
+Testi būs pareizi izpildījušies, ja konsolē parādās kaut kas līdzīgs šim:
+`
+OK (6 tests, 9 assertions)
+`
 
 ## Secinājumi un priekšlikumi
 - Noteikti varēja būt labāk.
@@ -179,6 +215,7 @@ npm test
 - Priekš front-end, izmantojot tikai React un PHP nepietika laika izveidot pierakstīšanos tā, lai lietotājs tiek izrakstīts, ja viņa profils pazūd no datubāzes.
 - no API izvēlējos visgrūtāko maršrutu attēlošanas veidu, kas bija `include[]=decoded_route`, nevis `include[]=polyline`, jo redzēju vienu maršrutu, kas bija pa taisni pāri ūdenim.
 - Pieņemu, ka palaižot komandu `npm run build` tiek izdzēsts visas nevajadzīgās lietas no kodēšanas procesa, lieki importi, komentāri, u.c.
+- Gan PHP, gan JS testus rakstīja mākslīgais intelekts ChatGpt, ņemot manu kodu kā piemēru. Testēt back-end darbību šajā projektā nav lielas nozīmes, jo automatizēto testu mērķis nav reāli iztestēt visas iespējamās darbības ar datubāzi un veikt API vaicājumus.
 
 ## Licence
 
