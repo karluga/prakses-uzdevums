@@ -1,4 +1,4 @@
-// App.js
+// RouteReport.js
 import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -49,7 +49,8 @@ function RouteReport() {
   const [vehicleError, setVehicleError] = useState("");
   const [dateRangeError, setDateRangeError] = useState("");
   const [routes, setRoutes] = useState([]);
-  const [fileName, setFileName] = useState("routes");
+  const [fileName, setFileName] = useState("Routes");
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
@@ -99,7 +100,13 @@ function RouteReport() {
       setTimeout(() => {
         setVehicleError("");
       }, 5000);
-
+      return;
+    }
+    if (!fromDate || !toDate) {
+      setDateRangeError("Please select both start and end dates.");
+      setTimeout(() => {
+        setDateRangeError("");
+      }, 5000);
       return;
     }
 
@@ -108,20 +115,31 @@ function RouteReport() {
 
     if (fromDate > currentDate || toDate > currentDate) {
       setDateRangeError("Dates cannot exceed the current date.");
+      setTimeout(() => {
+        setDateRangeError("");
+      }, 5000);
       return;
     }
 
     const timeDifference = toDate.getTime() - fromDate.getTime();
     const dayDifference = timeDifference / (1000 * 3600 * 24);
 
-    if (dayDifference > maxDateRange || fromDate > toDate) {
-      setDateRangeError("Invalid date range. Please check your dates.");
-
+    if (dayDifference > maxDateRange) {
+      setDateRangeError(
+        `The date range exceeds ${maxDateRange} days. Please select a shorter range.`
+      );
       setTimeout(() => {
         setDateRangeError("");
       }, 5000);
-      return;
+    } else if (fromDate > toDate) {
+      setDateRangeError(
+        "The start date cannot be after the end date. Please check your dates."
+      );
+      setTimeout(() => {
+        setDateRangeError("");
+      }, 5000);
     }
+
     const apiUrl = `${baseUrl}route/list.json?key=${
       process.env.REACT_APP_MAPON_API_KEY
     }&from=${fromDate.toISOString().split(".")[0] + "Z"}&till=${
@@ -166,11 +184,15 @@ function RouteReport() {
 
         console.log(validRoutes);
         setRoutes(validRoutes);
+      } else {
+        setRoutes([]);
+        // Message: No routes available.
       }
+      setInitialLoading(false);
     } catch (error) {
       console.error("An unexpected error occurred:", error);
+      return;
     }
-    console.log(vehicleOptions);
 
     const selectedVehicleOption = vehicleOptions.find(
       (option) => option.unit_id == selectedVehicle
@@ -183,6 +205,9 @@ function RouteReport() {
           fromDate
         )}_to_${formatCustomDate(toDate)}`
       );
+      console.log(`Routes_${label}_${number}_from_${formatCustomDate(
+        fromDate
+      )}_to_${formatCustomDate(toDate)}`);
     } else {
       console.warn(`No vehicle option found for unit_id: ${selectedVehicle}`);
     }
@@ -255,7 +280,7 @@ function RouteReport() {
               <button
                 id="excel-btn"
                 type="button"
-                onClick={() => exportToExcel(filterData(routes, fileName))}
+                onClick={() => exportToExcel(filterData(routes), fileName)}
               >
                 <ExcelIcon />
                 Export to Excel
@@ -266,10 +291,21 @@ function RouteReport() {
             </button>
           </div>
         </form>
-        {isLoaded &&
-          routes.map((route, index) => (
-            <MapComponent key={index} route={route} isLoaded={isLoaded} />
-          ))}
+        {!initialLoading &&
+          (isLoaded ? (
+            routes.length > 0 ? (
+              routes.map((route, index) => (
+                <MapComponent key={index} route={route} isLoaded={isLoaded} />
+              ))
+            ) : (
+              <p>
+                No routes available from {formatCustomDate(fromDate, ".")} to{" "}
+                {formatCustomDate(toDate, ".")}.
+              </p>
+            )
+          ) : initialLoading ? (
+            <p>Loading routes...</p>
+          ) : null)}
       </div>
     </>
   );

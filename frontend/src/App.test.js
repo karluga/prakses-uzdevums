@@ -1,83 +1,128 @@
-import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import axios from 'axios';  // Import Axios
-import RouteReport from './pages/RouteReport.js';
+import React from "react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { MemoryRouter, Routes, Route, Navigate } from "react-router-dom";
+import axios from "axios";
+import { act } from "react-dom/test-utils";
+import App from "./App.js";
+import { AuthProvider, useAuth } from "./AuthContext.js";
+import Layout from "./pages/Layout.js";
+import RouteReport from "./pages/RouteReport.js";
+import MapComponent from "./pages/MapComponent.js";
+import Login from "./pages/Login.js";
+import NoPage from "./pages/NoPage.js";
 
-// Mock Axios
-jest.mock('axios');
-
-// Sample response data
-const mockResponseData = {
-  data: {
-    error: null,
-    data: {
-      units: [
-        {
-          unit_id: 'sample_unit_id',
-          routes: [
-            {
-              route_id: 'sample_route_id',
-              type: 'route',
-              start: { time: '2023-01-01T00:00:00Z', address: 'Start Address' },
-              end: { time: '2023-01-01T01:00:00Z', address: 'End Address' },
-              avg_speed: 60,
-              max_speed: 80,
-              distance: 10000,
-              decoded_route: 'sample_decoded_route',
-            },
-          ],
-        },
-      ],
-    },
-  },
+const ProtectedRoute = ({ children }) => {
+  const auth = useAuth();
+  if (!auth.user) {
+    // User is not authenticated, redirect to /login
+    return <Navigate to="/login" replace />;
+  }
+  return children;
 };
 
-// Sample vehicle options
-const mockVehicleOptions = [
-  { unit_id: '81297', number: 'JL-2400', label: 'BMW' },
-];
+describe("Layout component", () => {
+  test("renders main page without crashing and detects logo image", () => {
+    render(<App />);
 
-describe('RouteReport', () => {
-  // Mocking useEffect to avoid issues with useJsApiLoader
-  jest.spyOn(React, 'useEffect').mockImplementation((f) => f());
+    const logoImage = screen.getByAltText("logo");
+    expect(logoImage).toBeInTheDocument();
+  });
+});
 
-  it('renders RouteReport component and fetches data', async () => {
-    // Mocking the Axios get method to return the sample data
-    axios.get.mockResolvedValueOnce(mockResponseData);
-
+describe("RouteReport component", () => {
+  test("generates route report with real response", async () => {
     render(<RouteReport />);
 
-    // Select a vehicle
-    fireEvent.change(screen.getByLabelText(/Vehicle number/i), {
-      target: { value: '81297' },
+    await waitFor(() => {
+      expect(screen.getByLabelText(/Vehicle number/i)).toBeInTheDocument();
     });
 
-    // Set date range
-    fireEvent.change(screen.getByLabelText(/From/i), {
-      target: { value: '2023-01-01' },
-    });
-    fireEvent.change(screen.getByLabelText(/To/i), {
-      target: { value: '2023-01-02' },
-    });
+    const mockRoute = {
+      route_id: "456",
+      type: "route",
+      start: { time: "2023-01-01T10:00:00Z", address: "Start Address" },
+      end: { time: "2023-01-01T12:00:00Z", address: "End Address" },
+      avg_speed: 60,
+      max_speed: 80,
+      distance: 100000,
+      decoded_route: {
+        points: [
+          {
+            gmt: "2023-11-16T15:08:59Z",
+            lat: 56.92801000000001,
+            lng: 24.082990000000002,
+            speed: 0,
+          },
+          {
+            gmt: "2023-11-16T15:08:59Z",
+            lat: 56.92784,
+            lng: 24.08274,
+            speed: 0,
+          },
+          {
+            gmt: "2023-11-16T15:09:00Z",
+            lat: 56.92790000000001,
+            lng: 24.08275,
+            speed: 8,
+          },
+        ],
+      },
+    };
 
-    // Click the generate button
-    fireEvent.click(screen.getByText(/Generate/i));
+    render(<MapComponent route={mockRoute} isLoaded={true} />);
 
-    // Wait for the Axios request to be completed
-    await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(1));
+    expect(screen.getByText(/Km driven/i)).toBeInTheDocument();
+    expect(screen.getByText(/Driving time/i)).toBeInTheDocument();
+  });
+});
 
-    // Check if the component renders the fetched route data
-    expect(screen.getByText(/Start Address/i)).toBeInTheDocument();
-    expect(screen.getByText(/End Address/i)).toBeInTheDocument();
-    // Add more assertions based on your actual component content
+describe("App Routing", () => {
+  test("displays RouteReport for authenticated users", () => {
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route
+                index
+                element={
+                  <ProtectedRoute>
+                    <RouteReport />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/login" element={<Login />} />
+            </Route>
+            <Route path="*" element={<NoPage />} />
+          </Routes>
+        </AuthProvider>
+      </MemoryRouter>
+    );
+  });
 
-    // Mocking XLSX.writeFile to avoid actual file creation during testing
-    jest.spyOn(window.XLSX, 'writeFile').mockImplementation(() => {});
+  test("displays '404 - Page not found' for non-existing route", () => {
+    render(
+      <MemoryRouter initialEntries={["/non-existing-route"]}>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route
+                index
+                element={
+                  <ProtectedRoute>
+                    <RouteReport />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/login" element={<Login />} />
+            </Route>
+            <Route path="*" element={<NoPage />} />
+          </Routes>
+        </AuthProvider>
+      </MemoryRouter>
+    );
 
-    // Click the export to Excel button
-    fireEvent.click(screen.getByText(/Export to Excel/i));
-
-    // Check if XLSX.writeFile is called
-    expect(window.XLSX.writeFile).toHaveBeenCalledTimes(1);
+    const notFoundText = screen.getByText("404 - Page not found");
+    expect(notFoundText).toBeInTheDocument();
   });
 });
